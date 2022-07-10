@@ -190,7 +190,7 @@ pub const To = struct {
                 JSC.C.JSValueRef => value,
 
                 else => {
-                    const Info: std.builtin.TypeInfo = comptime @typeInfo(Type);
+                    const Info: std.builtin.TypeInfo = @typeInfo(Type);
                     if (comptime Info == .Enum) {
                         const Enum: std.builtin.TypeInfo.Enum = Info.Enum;
                         if (comptime !std.meta.trait.isNumber(Enum.tag_type)) {
@@ -268,7 +268,7 @@ pub const To = struct {
                     }
 
                     if (comptime Info == .Struct) {
-                        if (comptime @hasDecl(Type, "Class") and @hasDecl(Type.Class, "isJavaScriptCoreClass")) {
+                        if (@hasDecl(Type, "Class") and @hasDecl(Type.Class, "isJavaScriptCoreClass")) {
                             if (comptime !@hasDecl(Type, "finalize")) {
                                 @compileError(comptime std.fmt.comptimePrint("JSC class {s} must implement finalize to prevent memory leaks", .{Type.Class.name}));
                             }
@@ -1484,15 +1484,15 @@ pub fn NewClassWithInstanceType(
                             try writer.writeAll(" ");
                         }
                         var read_only_ = false;
-                        if (options.read_only or @hasField(@TypeOf(comptime @field(staticFunctions, function_names[i])), "ro")) {
+                        if (options.read_only or @hasField(@TypeOf(@field(staticFunctions, function_names[i])), "ro")) {
                             read_only_ = true;
                             try writer.writeAll("ReadOnly");
                         }
 
                         if (comptime std.meta.trait.isContainer(
-                            @TypeOf(comptime @field(staticFunctions, function_names[i])),
+                            @TypeOf(@field(staticFunctions, function_names[i])),
                         ) and
-                            @hasField(@TypeOf(comptime @field(
+                            @hasField(@TypeOf(@field(
                             staticFunctions,
                             function_names[i],
                         )), "enumerable") and !@field(staticFunctions, function_names[i]).enumerable) {

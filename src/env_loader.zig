@@ -976,6 +976,23 @@ pub const Map = struct {
         return buf_map;
     }
 
+    pub fn cloneToEnvMap(this: *Map, allocator: std.mem.Allocator) !std.process.EnvMap {
+        var env_map = std.process.EnvMap.init(allocator);
+
+        const Convert = struct {
+            pub fn constStrToU8(s: string) []u8 {
+                return @intToPtr([*]u8, @ptrToInt(s.ptr))[0..s.len];
+            }
+        };
+
+        var iter_ = this.map.iterator();
+        while (iter_.next()) |entry| {
+            try env_map.putMove(Convert.constStrToU8(entry.key_ptr.*), Convert.constStrToU8(entry.value_ptr.*));
+        }
+
+        return env_map;
+    }
+
     pub inline fn init(allocator: std.mem.Allocator) Map {
         return Map{ .map = HashTable.init(allocator) };
     }

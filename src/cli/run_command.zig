@@ -240,16 +240,17 @@ pub const RunCommand = struct {
         }
 
         var argv = [_]string{ shell_bin, "-c", combined_script };
-        var child_process = try std.ChildProcess.init(&argv, ctx.allocator);
+        var child_process = std.ChildProcess.init(&argv, ctx.allocator);
 
         if (!silent) {
             Output.prettyErrorln("<r><d><magenta>$<r> <d><b>{s}<r>", .{combined_script});
             Output.flush();
         }
 
-        var buf_map = try env.map.cloneToBufMap(ctx.allocator);
+        // var buf_map = try env.map.cloneToBufMap(ctx.allocator);
+        var env_map = try env.map.cloneToEnvMap(ctx.allocator);
 
-        child_process.env_map = &buf_map;
+        child_process.env_map = &env_map; //&buf_map;
         child_process.cwd = cwd;
         child_process.stderr_behavior = .Inherit;
         child_process.stdin_behavior = .Inherit;
@@ -287,11 +288,12 @@ pub const RunCommand = struct {
             argv = array_list.toOwnedSlice();
         }
 
-        var child_process = try std.ChildProcess.init(argv, ctx.allocator);
+        var child_process = std.ChildProcess.init(argv, ctx.allocator);
 
-        var buf_map = try env.map.cloneToBufMap(ctx.allocator);
+        // var buf_map = try env.map.cloneToBufMap(ctx.allocator);
+        var env_map = try env.map.cloneToEnvMap(ctx.allocator);
         child_process.cwd = cwd;
-        child_process.env_map = &buf_map;
+        child_process.env_map = &env_map;
         child_process.stderr_behavior = .Inherit;
         child_process.stdin_behavior = .Inherit;
         child_process.stdout_behavior = .Inherit;

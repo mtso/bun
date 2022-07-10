@@ -499,8 +499,8 @@ pub const UpgradeCommand = struct {
                     std.mem.span(tmpname),
                 };
 
-                var unzip_process = try std.ChildProcess.init(&unzip_argv, ctx.allocator);
-                defer unzip_process.deinit();
+                var unzip_process = std.ChildProcess.init(&unzip_argv, ctx.allocator);
+                // defer unzip_process.deinit();
                 unzip_process.cwd = tmpdir_path;
                 unzip_process.stdin_behavior = .Inherit;
                 unzip_process.stdout_behavior = .Inherit;
@@ -594,13 +594,13 @@ pub const UpgradeCommand = struct {
                 };
 
                 env_loader.map.put("IS_BUN_AUTO_UPDATE", "true") catch unreachable;
-                var buf_map = try env_loader.map.cloneToBufMap(ctx.allocator);
+                var env_map = try env_loader.map.cloneToEnvMap(ctx.allocator);
                 _ = std.ChildProcess.exec(.{
                     .allocator = ctx.allocator,
                     .argv = &completions_argv,
                     .cwd = target_dirname,
                     .max_output_bytes = 4096,
-                    .env_map = &buf_map,
+                    .env_map = &env_map,
                 }) catch undefined;
             }
 
